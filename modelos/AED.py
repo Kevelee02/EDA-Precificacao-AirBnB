@@ -1,15 +1,8 @@
 #%%
-%pip install pandas
-%pip install numpy
-%pip install matplotlib
-%pip install seaborn
-%pip install feature-engine
-#%%
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from feature-engine import encoding 
 pd.set_option('display.max_row',15)
 #%%
 file_path = r'..\dados\teste_indicium_precificacao.csv'
@@ -87,41 +80,3 @@ sns.scatterplot(
 )
 plt.title('Distribuição Geométrica de Pontos em NY')
 plt.show()
-# %% Pré-processamento
-
-dados[variaveis_num].isna().sum()
-# %% Os Nas são basicamente de hostels que nunca tiveram review 
-
-dados.loc[dados['numero_de_reviews'] == 0, 'reviews_por_mes'] = 0
-# %%
-dados[variaveis_num].isna().sum()
-#%%
-
-dados[variaveis_cat].isna().sum()
-# %%
-dados['nome'].value_counts()
-# %%
-dados['host_name'].value_counts()
-# %%
-dados['reviews'] =  dados['ultima_review'].notna().astype(int)
-dados['reviews'].value_counts()
-dados.drop('ultima_review', axis=1, inplace= True)
-#%%
-variaveis_cat.append('reviews')
-variaveis_cat.remove('ultima_review')
-# %%
-dados[variaveis_cat].isna().sum()
-# %%
-variaveis_removiveis = ['id', 'nome', 'host_id', 'host_name']
-
-# %%
-
-dados.head()
-#%%
-dados_limpos = dados.drop(variaveis_removiveis, axis=1).copy()
-dados_limpos.info()
-# %%
-dados_limpos[variaveis_num].describe().T
-# %% Engenharia de features - Construindo novas features
-
-
