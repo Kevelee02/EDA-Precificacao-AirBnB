@@ -63,14 +63,6 @@ dados_limpos.info()
 # %%
 dados_limpos[variaveis_num].describe().T
 
-#dados_limpos.to_csv('../dados/dados_limpos.csv')
-# %% Engenharia de features - Construindo novas features
-
-dados_limpos.head()
-#%%
-dados['minimos_noites'].info()
-# %%
-def criar_variaveis(df):
-    df['room_type_group'] = df['bairro_group'] +'_'+ df['room_type']
+dados_limpos.to_csv('../dados/dados_limpos.csv')
 
 # %%
