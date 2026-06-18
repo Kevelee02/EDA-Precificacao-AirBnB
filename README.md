@@ -26,6 +26,12 @@ Bibliotecas necessárias:
 
   scikit-learn
 
+  seaborn
+
+  matplotlib
+
+  feature-engine
+
 
 # Resultados
 
