@@ -9,9 +9,11 @@ dados.head()
 # %%
 
 dados['bairro'].nunique()
-#%% Features Geospacial
+#%% Features Combainacoes
 
 def criar_variaveis(df):
+
+    df = df.copy()
     
     df['room_type_group'] = df['bairro_group'] + '_' + df['room_type']
     
