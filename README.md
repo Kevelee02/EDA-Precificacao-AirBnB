@@ -131,5 +131,7 @@ Os resultados mostram que fatores relacionados à localização e ao tipo de aco
 
 Apesar da utilização de engenharia de atributos e otimização de hiperparâmetros, o desempenho do modelo apresenta ganhos limitados, indicando que parte significativa da variabilidade dos preços depende de informações não presentes no conjunto de dados, como qualidade do imóvel, avaliações dos hóspedes, características visuais e fatores sazonais.
 
+  pytest
+
 
 ---
