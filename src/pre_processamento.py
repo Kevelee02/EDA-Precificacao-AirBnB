@@ -1,9 +1,4 @@
-#%%
-%pip install pandas
-%pip install numpy
-%pip install matplotlib
-%pip install seaborn
-%pip install feature-engine
+
 #%%
 import pandas as pd
 import numpy as np
@@ -63,6 +58,6 @@ dados_limpos.info()
 # %%
 dados_limpos[variaveis_num].describe().T
 
-dados_limpos.to_csv('../dados/dados_limpos.csv')
+dados_limpos.to_csv('../dados/dados_limpos.csv', index=False)
 
 # %%

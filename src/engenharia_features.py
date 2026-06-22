@@ -2,14 +2,8 @@
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
-#%%
-
-dados = pd.read_csv('../dados/dados_limpos.csv')
-dados.head()
-# %%
-
-dados['bairro'].nunique()
-#%% Features Combainacoes
+from sklearn.base import BaseEstimator, TransformerMixin
+from feature_engine.encoding import OneHotEncoder
 
 def criar_variaveis(df):
 
@@ -30,7 +24,7 @@ def criar_variaveis(df):
     df['dias_ocupados_estimados'] = 365 - df['disponibilidade_365']
     
     return df
-#%% Features Geospacial
+
 def calcular_distancia_haversine(lat1, lon1, lat2, lon2):
     """
     Calcula a distância em quilómetros entre dois pontos geográficos
@@ -51,37 +45,57 @@ def calcular_distancia_haversine(lat1, lon1, lat2, lon2):
     raio_terra_km = 6371
     return raio_terra_km * c
 
-#%% Features Geospacial
-def aplicar_engenharia_geoespacial(df, n_clusters=8):
-   
-    df_geo = df.copy()
-    
-    # 1. Definição dos Pontos de Interesse (POIs) em Nova Iorque
-    pontos_interesse = {
-        'distancia_times_square': (40.7580, -73.9855),
-        'distancia_aeroporto_jfk': (40.6413, -73.7781),
-        'distancia_central_park': (40.7851, -73.9683)
-    }
-    
-    # Cálculo iterativo das distâncias lineares para cada registo
-    for nome_feature, (poi_lat, poi_lon) in pontos_interesse.items():
-        df_geo[nome_feature] = calcular_distancia_haversine(
-            df_geo['latitude'], 
-            df_geo['longitude'], 
-            poi_lat, 
-            poi_lon
-        )
-        
-    # 2. Criação de Micro-Bairros via Clusterização Espacial
-    # Isolar apenas as colunas de localização para o treino do algoritmo
-    coordenadas = df_geo[['latitude', 'longitude']]
-    
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
-    df_geo['micro_bairro_cluster'] = kmeans.fit_predict(coordenadas)
-    
-    # Conversão do cluster para string (categórica) para evitar que o modelo 
-    # o interprete erroneamente como uma variável numérica contínua
-    df_geo['micro_bairro_cluster'] = df_geo['micro_bairro_cluster'].astype(str)
-    
-    return df_geo
+class EngenhariaFeatures(BaseEstimator, TransformerMixin):
+
+    def fit(self, X, y=None):
+        X = X.copy()
+
+        self.kmeans = KMeans(n_clusters=8, random_state=42, n_init=10)
+        self.kmeans.fit(X[['latitude', 'longitude']])
+
+        X_transformado = self._aplicar_transformacoes(X)
+
+        colunas_categoricas = X_transformado.select_dtypes(exclude=np.number).columns.tolist()
+        self.onehot = OneHotEncoder(variables=colunas_categoricas)
+        self.onehot.fit(X_transformado)
+
+        return self
+
+    def _aplicar_transformacoes(self, X):
+        X = X.copy()
+        X = self._engenharia_geoespacial(X)
+        X = criar_variaveis(X)
+        return X
+
+    def _engenharia_geoespacial(self, X):
+        df_geo = X.copy()
+
+        pontos_interesse = {
+            'distancia_times_square': (40.7580, -73.9855),
+            'distancia_aeroporto_jfk': (40.6413, -73.7781),
+            'distancia_central_park': (40.7851, -73.9683)
+        }
+
+        for nome_feature, (poi_lat, poi_lon) in pontos_interesse.items():
+            df_geo[nome_feature] = calcular_distancia_haversine(
+                lat1=df_geo['latitude'],
+                lon1=df_geo['longitude'],
+                lat2=poi_lat,
+                lon2=poi_lon
+            )
+
+        df_geo['micro_bairro_cluster'] = self.kmeans.predict(
+            df_geo[['latitude', 'longitude']]
+        ).astype(str)
+
+        # Dropa após todos os cálculos
+        df_geo = df_geo.drop(columns=['latitude', 'longitude'])
+
+        return df_geo
+
+    def transform(self, X):
+        X = X.copy()
+        X = self._aplicar_transformacoes(X)
+        X = self.onehot.transform(X)
+        return X
 # %%

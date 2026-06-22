@@ -1,5 +1,5 @@
 
-from src.engenharia_features import criar_variaveis, calcular_distancia_haversine
+from src.engenharia_features import criar_variaveis, calcular_distancia_haversine, aplicar_engenharia_geoespacial
 import pandas as pd
 
 
@@ -67,8 +67,24 @@ def test_distancia_haversine():
 
     assert dist_calculada == pytest.approx(dist_esperada, abs=0.01)
 
-if __name__ == "__main__":
-    print("--- INICIANDO BATERIA DE TESTES ---\n")
-    test_criar_variaveis()
-    test_distancia_haversine()
-    print("--- TODOS OS TESTES PASSARAM COM SUCESSO! ---")
+def test_aplicar_engenharia_geoespacial():
+    import pandas as pd
+
+def test_aplicar_engenharia_geoespacial_cria_colunas():
+
+    df = pd.DataFrame({
+        "latitude": [40.7580, 40.7851, 40.6413],
+        "longitude": [-73.9855, -73.9683, -73.7781]
+    })
+
+    resultado = aplicar_engenharia_geoespacial(df, n_clusters=2)
+
+    colunas_esperadas = [
+        "distancia_times_square",
+        "distancia_aeroporto_jfk",
+        "distancia_central_park",
+        "micro_bairro_cluster"
+    ]
+
+    for coluna in colunas_esperadas:
+        assert coluna in resultado.columns
