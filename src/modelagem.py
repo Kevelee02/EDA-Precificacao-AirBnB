@@ -57,8 +57,8 @@ pipeline.fit(X_train, y_train)
 # %%
 y_pred_test = pipeline.predict(X_test)
 #%%
-r_2 = r2_score(y_pred_test, y_test)
-msr = mean_absolute_error(y_pred_test, y_test)
+r_2 = r2_score(y_test, y_pred_test)
+msr = mean_absolute_error(y_test, y_pred_test)
 print(f' Erro médio absoluto: {msr}')
 print(f'R Quadrado: {r_2}')
 # %% Aplicando log no target
@@ -70,3 +70,25 @@ y_pred = np.expm1(pipeline.predict(X_test))
 
 print(f"\nMAE: {mean_absolute_error(y_test, y_pred):.2f}")
 print(f"R²:  {r2_score(y_test, y_pred):.2f}")
+# %% Busca de Hyperparametros
+y_val2_log = np.log1p(y_val2)
+
+paramns = {
+    'modelo__n_estimators' : [100, 200, 300, 500],
+    'modelo__max_depth' : [None, 5, 10, 15], 
+    'modelo__min_samples_split' : [2 , 5, 10],
+    'modelo__min_samples_leaf' : [5, 10],
+}
+from sklearn.model_selection import GridSearchCV, cross_val_score
+
+gsv = GridSearchCV(pipeline, 
+                   paramns,
+                   cv = 3, 
+                   scoring= 'r2',
+                   n_jobs=-1)
+gsv.fit(X_val2, y_val2)
+gsv.best_params_
+#%%
+gsv.best_score_
+
+# %%
