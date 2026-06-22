@@ -32,6 +32,8 @@ Bibliotecas necessárias:
 
   feature-engine
 
+  pytest
+
 
 # Resultados
 
